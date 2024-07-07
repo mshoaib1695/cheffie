@@ -1,0 +1,292 @@
+CREATE TABLE `phone_numbers` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`country_code` varchar(45) NOT NULL,
+	`dialing_code` varchar(10) NOT NULL,
+	`national_number` varchar(255) NOT NULL,
+	`user_id` int NOT NULL,  
+	`createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	`updatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+
+)
+
+INSERT INTO `phone_numbers` VALUES 
+('1','GB',+92,'3142279909','21','2021-07-02 10:11:33','2021-07-02 10:11:33')
+__________________________________________________________________________
+CREATE TABLE `chefmenus` (
+  `chefId` int NOT NULL,
+  `menuId` int NOT NULL,
+  `createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`chefId`,`menuId`)
+)
+
+INSERT INTO `chefmenus` VALUES 
+(1,1,'2021-07-02 10:11:33','2021-07-02 10:11:33'),
+(1,2,'2021-07-02 10:11:33','2021-07-02 10:11:33'),
+(1,3,'2021-07-02 10:11:33','2021-07-02 10:11:33'),
+(1,4,'2021-07-13 10:18:31','2021-07-13 10:18:31'),
+(2,1,'2021-07-02 10:11:33','2021-07-02 10:11:33'),
+(2,2,'2021-07-02 10:11:33','2021-07-02 10:11:33'),
+(3,2,'2021-07-02 10:11:33','2021-07-02 10:11:33'),
+(3,3,'2021-07-02 10:11:33','2021-07-02 10:11:33'),
+(3,4,'2021-07-13 10:18:31','2021-07-13 10:18:31');
+
+______________________________________________________
+
+CREATE TABLE `view_quotes` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`bookingId` int NOT NULL,
+	`menu` JSON NOT NULL,
+	`actual_menu_id` int NOT NULL,
+	`cus_id` int NOT NULL,  
+	`status` varchar(24) NOT NULL,
+	`price` DECIMAL(10,2) NOT NULL,
+	`createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	`updatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (cus_id) REFERENCES customers(id),
+   	FOREIGN KEY (actual_menu_id) REFERENCES menus(id),
+	FOREIGN KEY (bookingId) REFERENCES bookings(id)
+)
+INSERT INTO `view_quotes` VALUES 
+(1,23,'{\"title\":\"Hummus Dinner\",\"contents\":[{\"title\":\"Starters\",\"description\":\"Lorem Ipsum adalah contoh teks atau dummy dalam industri percetakan dan penataan huruf atau typesetting. Lorem Ipsum telah menjadi standar contoh teks sejak tahun typesetting. \"},{\"title\":\"Main Course\",\"description\":\"Lorem Ipsum adalah contoh teks atau dummy dalam industri percetakan dan penataan huruf atau typesetting. Lorem Ipsum telah menjadi standar contoh teks sejak tahun typesetting. \"},{\"title\":\"Side Dishes\",\"description\":\"Lorem Ipsum adalah contoh teks atau dummy dalam industri percetakan dan penataan huruf atau typesetting. Lorem Ipsum telah menjadi standar contoh teks sejak tahun typesetting. \"},{\"title\":\"Dessert\",\"description\":\"Lorem Ipsum adalah contoh teks atau dummy dalam industri percetakan dan penataan huruf atau typesetting. Lorem Ipsum telah menjadi standar contoh teks sejak tahun typesetting. \"}]}',1,9,'2021-07-02 10:11:33','2021-07-02 10:11:33','quote_pending', 23);
+______________________________________________________
+alter table bookings 
+add column 	`thumbs_up` TINYINT default null; 
+______________________________________________________
+use chf_db;
+
+CREATE TABLE `chats` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`customer_id` int NOT NULL,  
+	`chef_id` int NOT NULL,  
+	`status` varchar(11) DEFAULT NULL,
+	`createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	`updatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+    	FOREIGN KEY (chef_id) REFERENCES chefs(id),
+    	FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+
+CREATE TABLE `messages` (
+	`id` int NOT NULL AUTO_INCREMENT,
+   	`chat_id` int NOT NULL,
+	`msg` varchar(1000) NOT NULL,
+	`isImg` TINYINT NOT NULL,
+	`receiver` int NOT NULL,
+	`sender` int NOT NULL,  
+	`status` varchar(11) DEFAULT NULL,
+	`datetime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+   	FOREIGN KEY (chat_id) REFERENCES chats(id)
+);
+
+______________________________________________________
+
+
+CREATE TABLE `images` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(60) NOT NULL,
+  `url` varchar(120) DEFAULT NULL,
+  `width` bigint(10) DEFAULT NULL,
+  `height` bigint(10) DEFAULT NULL,
+  `mimetype` varchar(255) DEFAULT NULL,
+  `ext` varchar(60) DEFAULT NULL,
+  `createdAt` datetime DEFAULT NULL,
+  `updatedAt` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+______________________________________________________
+ALTER TABLE `chf_db`.`chefs` 
+CHANGE COLUMN `reviews` `reviews` DECIMAL(10,2) NULL DEFAULT NULL ;
+
+
+______________________________________________________
+CREATE TABLE `strp_pay_methods` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`customer_id` int NOT NULL,
+	`stripe_pm_id` varchar(50) NOT NULL,
+	`stripe_cust_id` varchar(50) NOT NULL,
+	`createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	`updatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+   	FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+______________________________________________________
+CREATE TABLE `payments` (
+	`id` int NOT NULL AUTO_INCREMENT,
+   	`customer_id` int NOT NULL,
+	`booking_id` int NOT NULL,
+	`str_charge_id` varchar(50) NOT NULL,
+	`amount` double NOT NULL,
+	`paidout` double NOT NULL,
+	`createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	`updatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+   	FOREIGN KEY (customer_id) REFERENCES customers(id),
+	FOREIGN KEY (booking_id) REFERENCES bookings(id)
+);
+______________________________________________________
+
+ALTER TABLE `chf_db`.`bookings`
+ADD COLUMN `is_promotion`TINYINT NOT NULL default 0,
+ADD COLUMN `amount_off`  DECIMAL(10,2) NULL DEFAULT NULL,
+ADD COLUMN `percent_off`  DECIMAL(10,2) NULL DEFAULT NULL ;
+______________________________________________________
+
+ALTER TABLE `chf_db`.`customers`
+ADD COLUMN `stripe_cus_id` varchar(50) default NULL;
+______________________________________________________
+
+ALTER TABLE `chf_db`.`chefs`
+ADD COLUMN `stripe_chef_id` varchar(50) default NULL
+__________________________________________________________
+ALTER TABLE `chf_db`.`bookings`
+ADD COLUMN `payment_id` int default NULL,
+ADD FOREIGN KEY (payment_id) REFERENCES strp_pay_methods(id);
+_________________________________________________
+ALTER TABLE `chf_db`.`chefs`
+ADD COLUMN `title` varchar(50) default NULL
+ADD COLUMN `city` varchar(50) default NULL
+__________________
+
+ALTER TABLE `chf_db`.`bookings`
+ADD COLUMN `addressline2` varchar(150) default NULL,
+ADD COLUMN `postcode` varchar(50) default NULL;
+
+-----------------------------------
+ALTER TABLE `chf_db`.`menus`
+ADD COLUMN `max_persons` int default 0;
+-----------------------------------
+ALTER TABLE `chf_db`.`chefs`
+ADD COLUMN `dob` date default null;
+
+________________________________________
+ALTER TABLE `chf_db`.`chefs`
+ADD COLUMN `addressline1` varchar(150) default NULL,
+ADD COLUMN `addressline2` varchar(150) default NULL,
+ADD COLUMN `postcode` varchar(50) default NULL;
+_____________________________________________________
+CREATE TABLE `chef_reqs` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`user_id` int NOT NULL,
+	`password` varchar(50) NOT NULL,
+	`is_accepted` TINYINT NOT NULL default 0,
+	`is_rejected` TINYINT NOT NULL default 0,
+	`is18_plus` TINYINT NOT NULL default 0,
+	`work_rights` TINYINT NOT NULL default 0,
+	`terms_condition` TINYINT NOT NULL default 0,
+	`bio` varchar(500) NOT NULL,
+	`createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	`updatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`user_id`) REFERENCES users(id)
+);
+____________________________________________________________
+ALTER TABLE `chf_db`.`chefs`
+ADD COLUMN `on_board` TINYINT NOT NULL default 0
+____________________________________________________________
+ALTER TABLE `chf_db`.`customers`
+ADD COLUMN `status` VARCHAR(10) NOT NULL default 'active'
+________________________________________
+CREATE TABLE `booking_logs` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`bookingId` int NOT NULL,
+	`action` varchar(50) NOT NULL,
+	`createdAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	`updatedAt` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`bookingId`) REFERENCES bookings(id)
+);
+
+-----------------
+ALTER TABLE `chf_db`.`chefmenus`
+ADD COLUMN `status` VARCHAR(10) NOT NULL default 'pending'
+-----------------
+ALTER TABLE `chf_db`.`chef_areas`
+ADD COLUMN `status` VARCHAR(10) NOT NULL default 'pending'
+----------
+ALTER TABLE `chf_db`.`chef_availabilities`
+ADD COLUMN `status` VARCHAR(10) NOT NULL default 'pending'
+-----------------------------------------------------------
+Create table `chf_db`.`chef_documents` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`chef_id` int NOT NULL,
+	`location` VARCHAR(32),
+	`key` VARCHAR(250) NOT NULL,
+	`status` VARCHAR(10) NOT NULL DEFAULT 'pending',
+	`document_type` VARCHAR(16) NOT NULL,
+	`created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`chef_id`) REFERENCES chefs(id)
+)
+-----------------------------------------------------------
+ALTER TABLE `chf_db`.`chefs`
+ADD COLUMN `is_active` VARCHAR(10) NOT NULL default 'pending'
+ADD COLUMN `is_live` TINYINT NOT NULL default 1,
+
+ALTER TABLE `chf_db`.`chef_availabilities` 
+CHANGE COLUMN `status` `status` VARCHAR(10) NOT NULL DEFAULT 'accepted' ;
+---------------------------------
+use chf_db;
+ALTER TABLE menus 
+ADD CONSTRAINT `cuisineId` 
+FOREIGN KEY(`cuisineId`) REFERENCES cuisines(id)
+------------------------------------------
+ALTER TABLE `chf_db`.`bookings` 
+ADD COLUMN `payment_intent_id` VARCHAR(100) ;
+-------------------------------------------
+create table `chf_db`.`chef_payment_transfers`(
+	`id` int NOT NULL AUTO_INCREMENT,
+	`chef_id` int NOT NULL,
+   `booking_id` int NOT NULL,
+   `payment_id`  int NOT NULL,
+	`customer_id`  int NOT NULL,
+   `pay_method_id` int NOT NULL,
+   `total_amount` double,
+   `paid_amount` double,
+   `remaining_amount` double,
+	`status` varbinary(50) NULL,
+	`created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`chef_id`) REFERENCES chefs(id),
+  	FOREIGN KEY (`booking_id`) REFERENCES bookings(id),
+	FOREIGN KEY (`payment_id`) REFERENCES payments(id),
+	FOREIGN KEY (`customer_id`) REFERENCES customers(id),
+	FOREIGN KEY (`pay_method_id`) REFERENCES strp_pay_methods(id)
+  );
+
+
+-----------------------------------------
+create table `chf_db`.`chef_payments`(
+	`id` int NOT NULL AUTO_INCREMENT,
+	`chef_id` int NOT NULL,
+	`transfer_id`  int NOT NULL,
+   `stripe_transfer_id` VARCHAR(250) NOT NULL,
+   `amount` double,
+   `paidout` double,
+	`status` varbinary(50) NULL,
+	`created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`chef_id`) REFERENCES chefs(id),
+	FOREIGN KEY (`transfer_id`) REFERENCES chef_payment_transfers(id)
+  );
+  -----------------------------------------
+create table `chf_db`.`notification_settings` (
+	`id` int NOT NULL AUTO_INCREMENT,
+	`user_id` int NOT NULL,
+	`app_notifications` TINYINT default 0,
+	`news_offers_notifications` TINYINT default 0,
+	`created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	`updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`user_id`) REFERENCES users(id)
+  );
+  --------------------------------------------------------------------
+ALTER TABLE `chf_db`.`chefs` 
+ADD COLUMN `is_profile_approved` TINYINT NOT NULL default 0;

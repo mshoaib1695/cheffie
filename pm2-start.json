@@ -1,0 +1,10 @@
+{
+      "script": "./dist-server/index.js",
+      "watch": true,
+      "exec_mode": "fork",
+      "ignore_watch": [".env"],
+      "watch_options": {
+        "followSymlinks": false
+      },
+      "name": "cheffie-be"
+}
